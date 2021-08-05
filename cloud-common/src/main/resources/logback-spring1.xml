@@ -1,0 +1,42 @@
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>-%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr([user:%X{username}]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="CONSOLE_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                <maxLength>2048</maxLength>
+                <shortenedClassNameLength>100</shortenedClassNameLength>
+                <exclude>sun\.reflect\..*\.invoke.*</exclude>
+                <exclude>net\.sf\.cglib\.proxy\.MethodProxy\.invoke</exclude>
+                <rootCauseFirst>true</rootCauseFirst>
+                <inlineHash>true</inlineHash>
+            </throwableConverter>
+<!--            <jsonGeneratorDecorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">-->
+<!--                <valueMasker class="com.successwareg2.common.spring.config.SensitiveMasker"/>-->
+<!--            </jsonGeneratorDecorator>-->
+        </encoder>
+    </appender>
+
+<!--    <springProfile name="local,ci">-->
+<!--        <root level="INFO">-->
+<!--            <appender-ref ref="CONSOLE"/>-->
+<!--        </root>-->
+<!--    </springProfile>-->
+
+<!--    <springProfile name="dev,qa,uat,rc,prod">-->
+<!--        <root level="INFO">-->
+<!--            <appender-ref ref="CONSOLE_JSON"/>-->
+<!--        </root>-->
+<!--    </springProfile>-->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE_JSON"/>
+    </root>
+</configuration>

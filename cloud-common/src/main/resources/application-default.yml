@@ -1,0 +1,55 @@
+server:
+  max-http-header-size: 2MB
+spring:
+  cache:
+    type: redis
+    redis:
+      timeToLive: 10m
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    enable: false
+    base-url: http://localhost:9913
+    service:
+      name: ${spring.application.name}-${spring.profiles.active}
+feign:
+  hystrix:
+    enabled: false
+  client:
+    config:
+      default:
+        connectTimeout: 2000
+        readTimeout: 30000
+  okhttp:
+    enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  server:
+# 因为是本地启动,端口会冲突不陪这个端口,采用的是 server.port
+#    port: 9091
+    ssl:
+      enabled: false
+    base-path: /
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+    web:
+      server:
+        request:
+          autotime:
+            percentiles: 0.95, 0.90, 0.50
+      client:
+        request:
+          autotime:
+            percentiles: 0.95
+    tags:
+      application: ${spring.application.name}
+

@@ -1,0 +1,9 @@
+
+# 配置 web 默认配置
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    com.mflyyou.cloud.common.CloudCommonConfiguration
+
+
+# 配置默认配置
+org.springframework.boot.env.EnvironmentPostProcessor=\
+    com.mflyyou.cloud.common.env.ApplicationDefaultEnvironmentPostProcessor

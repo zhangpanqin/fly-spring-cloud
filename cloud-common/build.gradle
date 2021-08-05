@@ -1,0 +1,15 @@
+plugins {
+    id "java-library"
+}
+
+dependencies {
+    compileOnly 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    api("org.apache.commons:commons-lang3")
+    api("org.apache.commons:commons-collections4")
+    api("org.springframework.boot:spring-boot-starter-actuator")
+//            借助 Micrometer 对接 Prometheus 监控系统
+    api("io.micrometer:micrometer-registry-prometheus")
+    api 'org.springframework.cloud:spring-cloud-starter-openfeign'
+}

@@ -1,0 +1,79 @@
+version: '3'
+services:
+  db:
+    image: postgres:12
+    container_name: fly-spring-contract-postgresql
+    restart: always
+    ports:
+      - '9910:5432'
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+    volumes:
+      - fly-spring-contract-postgresql:/var/lib/postgresql
+      - fly-spring-contract-postgresql_data:/var/lib/postgresql/data
+    networks:
+      - fly-spring-contract
+  nexus:
+    image: sonatype/nexus3
+    restart: always
+    container_name: fly-spring-contract-nexus3
+    ports:
+      - "9908:8081"
+    networks:
+      - fly-spring-contract
+    volumes:
+      - fly-spring-contract-nexus-data:/nexus-data
+  redis:
+    container_name: fly-spring-contract-redis
+    image: bitnami/redis:6.0
+    restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - '9911:6379'
+    networks:
+      - fly-spring-contract
+    volumes:
+      - fly-spring-contract-redis-data:/bitnami/redis/data
+  grafana:
+    container_name: fly-spring-contract-grafana
+    image: grafana/grafana:8.0.6
+    restart: always
+    ports:
+      - '9912:3000'
+    networks:
+      - fly-spring-contract
+  openzipkin:
+    container_name: fly-spring-contract-openzipkin
+    restart: always
+    image: openzipkin/zipkin:2
+    ports:
+      - '9913:9411'
+    networks:
+      - fly-spring-contract
+  prometheus:
+    container_name: fly-spring-contract-prometheus
+    restart: always
+    image: bitnami/prometheus:2.28.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./prometheus:/etc/prometheus/
+    ports:
+      - '9914:9090'
+    networks:
+      - fly-spring-contract
+
+networks:
+  fly-spring-contract:
+    driver: bridge
+volumes:
+  fly-spring-contract-nexus-data:
+    driver: local
+  fly-spring-contract-postgresql:
+    driver: local
+  fly-spring-contract-postgresql_data:
+    driver: local
+  fly-spring-contract-redis-data:
+    driver: local

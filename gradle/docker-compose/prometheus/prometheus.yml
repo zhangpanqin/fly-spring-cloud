@@ -1,0 +1,45 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+alerting:
+  alertmanagers:
+    - follow_redirects: true
+      scheme: http
+      timeout: 10s
+      api_version: v2
+      static_configs:
+        - targets: []
+scrape_configs:
+  - job_name: prometheus
+    honor_timestamps: true
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    metrics_path: /metrics
+    scheme: http
+    follow_redirects: true
+    static_configs:
+      - targets:
+          - localhost:9090
+# 只需要添加 job 监控就可以
+  - job_name: order-management-service
+    honor_timestamps: true
+#    多久采集一次,默认 15s
+    scrape_interval: 10s
+    scrape_timeout: 10s
+    metrics_path: /actuator/prometheus
+    scheme: http
+    follow_redirects: true
+    static_configs:
+      - targets:
+          - host.docker.internal:8080
+  - job_name: user-management-service
+    honor_timestamps: true
+    scrape_interval: 10s
+    scrape_timeout: 10s
+    metrics_path: /actuator/prometheus
+    scheme: http
+    follow_redirects: true
+    static_configs:
+      - targets:
+          - host.docker.internal:8081

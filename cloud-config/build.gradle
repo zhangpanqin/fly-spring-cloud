@@ -1,0 +1,12 @@
+plugins {
+    id "idea"
+    id "org.springframework.boot"
+}
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.springframework.cloud:spring-cloud-config-server'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
