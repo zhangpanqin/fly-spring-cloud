@@ -105,7 +105,7 @@ ab -n 10000000 -c 200 -s 20000  http://localhost:8081/users/223
 
 ### spring cloud config
 
-actuator 配置的信息
+actuator 刷新配置的信息
 
 ```txt
 curl -X POST -d {} -H "Content-Type: application/json" http://localhost:8080/actuator/refresh
@@ -147,7 +147,7 @@ public class OrderManagementServiceApplication {
     @Scheduled(fixedDelay = 5000)
     public void run() {
         System.out.println(appConfig.getConfi_test());
-        System.out.println("----------------");
+        System.out.println("----------------"); 
         System.out.println(test2);
 
     }
@@ -159,3 +159,7 @@ EnvironmentChangeEvent
 ```
 
 refresh 会触发 bean 的销毁和创建逻辑
+
+```
+@RefreshScope
+```

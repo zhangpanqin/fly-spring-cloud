@@ -1,0 +1,2 @@
+app:
+  config_sort: "./file/application-local.yml"

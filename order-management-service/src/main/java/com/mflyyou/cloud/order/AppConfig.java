@@ -13,7 +13,6 @@ import javax.annotation.PreDestroy;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "app")
-@RefreshScope
 public class AppConfig {
     private String confi_test = "默认值";
 

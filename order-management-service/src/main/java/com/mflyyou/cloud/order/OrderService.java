@@ -5,12 +5,14 @@ import com.mflyyou.cloud.sdk.request.CreateOrderRequest;
 import com.mflyyou.cloud.sdk.response.CreateOrderResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 
 @Service
 @Slf4j
+@RefreshScope
 public class OrderService {
     private final Tracer tracer;
     private final ApplicationContext applicationContext;

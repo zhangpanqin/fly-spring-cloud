@@ -1,0 +1,3 @@
+app:
+  confi_test: confi_test
+  config_sort: "classpath:/application-local.yml"

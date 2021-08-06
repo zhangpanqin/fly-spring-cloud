@@ -6,6 +6,9 @@ spring:
   application:
     name: order-management-service
   config:
-    import: optional:configserver:http://localhost:8888
+    import:
+      - optional:configserver:http://localhost:8889
+      - optional:my:/my_config
 app:
   confi_test: confi_test
+  config_sort: "classpath:/application.yml"
