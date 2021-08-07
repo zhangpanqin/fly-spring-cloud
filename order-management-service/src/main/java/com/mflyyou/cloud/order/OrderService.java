@@ -1,6 +1,5 @@
 package com.mflyyou.cloud.order;
 
-import brave.Tracer;
 import com.mflyyou.cloud.sdk.request.CreateOrderRequest;
 import com.mflyyou.cloud.sdk.response.CreateOrderResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -14,18 +13,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RefreshScope
 public class OrderService {
-    private final Tracer tracer;
-    private final ApplicationContext applicationContext;
-    @Autowired
-    private ScopeTest scopeTest;
 
-    public OrderService(Tracer tracer, ApplicationContext applicationContext) {
-        this.tracer = tracer;
-        this.applicationContext = applicationContext;
-    }
+    @Autowired
+    private ApplicationContext applicationContext;
 
     public CreateOrderResponse create(CreateOrderRequest request) {
-        log.info("traceId: {}", tracer.currentSpan().context().traceIdString());
         if (request.getUserId()!=null && request.getUserId() % 2==0) {
             throw new RuntimeException("故意抛出异常");
         }
@@ -34,9 +26,8 @@ public class OrderService {
                 .build();
     }
 
-    public void testS() {
-        System.out.println(applicationContext);
-        System.out.println(applicationContext.getParent());
-        System.out.println(scopeTest);
+    public void refreshScopeInfo() {
+        System.out.println(applicationContext.getBean("orderService"));
+        System.out.println("study refresh scope");
     }
 }
