@@ -8,6 +8,8 @@ public enum CommonErrorCode implements ErrorCode {
 
     DATA_FORMAT_INCORRECT(400, "Data format incorrect"),
 
+    REQUEST_VALIDATION_FAILED(400, "Data is invalid and the check failed"),
+
     SERVER_ERROR(500, "Server error not resolve");
 
 

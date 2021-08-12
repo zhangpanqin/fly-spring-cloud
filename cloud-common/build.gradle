@@ -3,7 +3,8 @@ plugins {
 }
 
 dependencies {
-    compileOnly 'org.springframework.boot:spring-boot-starter-web'
+    api 'org.springframework.boot:spring-boot-starter-web'
+    api 'org.springframework.boot:spring-boot-starter-validation'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     api("org.apache.commons:commons-lang3")

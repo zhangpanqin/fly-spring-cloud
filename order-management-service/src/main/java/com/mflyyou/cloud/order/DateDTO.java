@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -19,4 +22,7 @@ public class DateDTO implements Serializable {
     private LocalDate localDate;
     private LocalDateTime localDateTime;
     private Instant instant;
+    @NotBlank(message = "name is empty")
+    @Min(10)
+    private String name;
 }

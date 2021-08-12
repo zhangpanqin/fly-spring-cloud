@@ -10,11 +10,14 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.mflyyou.cloud.common.config.WebMvcConfiguration;
+import com.mflyyou.cloud.common.exception.resolver.CommonErrorControllerConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.time.Instant;
@@ -40,11 +43,10 @@ public class CloudCommonConfiguration {
         return new WebMvcConfiguration();
     }
 
+
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(Jackson2ObjectMapperBuilder.class)
-    static class Jackson2CustomizerConfig implements Ordered {
-
-
+    static class Jackson2CustomizerConfig {
         @Bean
         public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {
             return builder -> {
@@ -66,11 +68,6 @@ public class CloudCommonConfiguration {
                     objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
                 });
             };
-        }
-
-        @Override
-        public int getOrder() {
-            return 100;
         }
     }
 }
