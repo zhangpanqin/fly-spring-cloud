@@ -1,7 +1,8 @@
 # 配置 web 默认配置
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-    com.mflyyou.cloud.common.CloudCommonConfiguration,\
-  com.mflyyou.cloud.common.exception.resolver.CommonErrorControllerConfiguration
+    com.mflyyou.cloud.common.CommonWebMvcAutoConfiguration,\
+  com.mflyyou.cloud.common.CommonErrorControllerAutoConfiguration,\
+  com.mflyyou.cloud.common.CommonJacksonCustomizerAutoConfiguration
 # 配置默认配置
 org.springframework.boot.env.EnvironmentPostProcessor=\
     com.mflyyou.cloud.common.env.ApplicationDefaultEnvironmentPostProcessor

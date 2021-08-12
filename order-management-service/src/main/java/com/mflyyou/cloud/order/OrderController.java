@@ -1,6 +1,7 @@
 package com.mflyyou.cloud.order;
 
 import com.mflyyou.cloud.common.exception.AccessDeniedAppException;
+import com.mflyyou.cloud.common.log.annotation.Loggable;
 import com.mflyyou.cloud.sdk.OrderApi;
 import com.mflyyou.cloud.sdk.request.CreateOrderRequest;
 import com.mflyyou.cloud.sdk.response.CreateOrderResponse;
@@ -50,6 +51,7 @@ public class OrderController implements OrderApi {
     }
 
     @GetMapping("/get/{date}")
+    @Loggable
     public DateDTO test(@PathVariable LocalDate date, LocalDateTime localDateTime, Instant instant) {
         return DateDTO.builder()
                 .localDate(date)

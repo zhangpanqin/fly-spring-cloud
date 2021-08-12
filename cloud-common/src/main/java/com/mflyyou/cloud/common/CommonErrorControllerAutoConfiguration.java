@@ -1,6 +1,9 @@
-package com.mflyyou.cloud.common.exception.resolver;
+package com.mflyyou.cloud.common;
 
+import com.mflyyou.cloud.common.exception.resolver.CommonErrorResponse;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties;
@@ -18,7 +21,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.DispatcherServlet;
 
+import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Map;
@@ -27,8 +32,10 @@ import static com.mflyyou.cloud.common.exception.resolver.CommonErrorCode.SERVER
 
 @Configuration
 @AutoConfigureBefore(ErrorMvcAutoConfiguration.class)
+@ConditionalOnClass({ Servlet.class, DispatcherServlet.class })
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @EnableConfigurationProperties({ ServerProperties.class})
-public class CommonErrorControllerConfiguration {
+public class CommonErrorControllerAutoConfiguration {
     @Controller
     @RequestMapping("${server.error.path:${error.path:/error}}")
     static class CommonErrorController extends AbstractErrorController {

@@ -9,13 +9,8 @@ import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
-import com.mflyyou.cloud.common.config.WebMvcConfiguration;
-import com.mflyyou.cloud.common.exception.resolver.CommonErrorControllerConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -36,16 +31,11 @@ import static com.mflyyou.cloud.common.constant.TimeFormatterConstant.TIME_FORMA
  * jackson 日期反序列化和序列化
  */
 @Configuration(proxyBeanMethods = false)
-public class CloudCommonConfiguration {
-
-    @Bean
-    public WebMvcConfiguration cloudCommonWebMvcConfiguration() {
-        return new WebMvcConfiguration();
-    }
+@ConditionalOnClass(Jackson2ObjectMapperBuilder.class)
+public class CommonJacksonCustomizerAutoConfiguration {
 
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnClass(Jackson2ObjectMapperBuilder.class)
     static class Jackson2CustomizerConfig {
         @Bean
         public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {

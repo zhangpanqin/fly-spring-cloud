@@ -1,5 +1,6 @@
 package com.mflyyou.cloud;
 
+import com.mflyyou.cloud.common.EnableLogging;
 import com.mflyyou.cloud.order.AppConfig;
 import com.mflyyou.cloud.order.ScopeTest;
 import com.mflyyou.cloud.order.TestInit;
@@ -14,6 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
+@EnableLogging
 public class OrderManagementServiceApplication {
     @Autowired
     private AppConfig appConfig;
