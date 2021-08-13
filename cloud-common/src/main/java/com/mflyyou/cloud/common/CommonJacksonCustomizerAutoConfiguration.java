@@ -30,10 +30,10 @@ import static com.mflyyou.cloud.common.constant.TimeFormatterConstant.TIME_FORMA
  * jackson 日期反序列化和序列化
  */
 @Configuration(proxyBeanMethods = false)
+@ConditionalOnClass(Jackson2ObjectMapperBuilder.class)
 public class CommonJacksonCustomizerAutoConfiguration {
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnClass(Jackson2ObjectMapperBuilder.class)
     static class Jackson2CustomizerConfig {
         @Bean
         public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {

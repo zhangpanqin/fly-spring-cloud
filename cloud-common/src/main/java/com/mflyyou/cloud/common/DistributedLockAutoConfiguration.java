@@ -6,7 +6,6 @@ import com.mflyyou.cloud.common.lock.executor.DistributedLockExecutor;
 import org.aopalliance.aop.Advice;
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -21,13 +20,12 @@ import org.springframework.core.env.Environment;
 import javax.validation.constraints.NotNull;
 
 @AutoConfigureAfter(RedisAutoConfiguration.class)
-@ConditionalOnClass(RedissonClient.class)
 @ConditionalOnProperty(name = "app.distributed_lock.enable", havingValue = "true", matchIfMissing = true)
 @ConditionalOnBean(RedissonClient.class)
+@ConditionalOnClass({Advice.class, RedissonClient.class})
 public class DistributedLockAutoConfiguration {
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnClass({Advice.class, RedissonClient.class})
     static class DistributedLockAdvisorConfiguration {
 
         @Bean

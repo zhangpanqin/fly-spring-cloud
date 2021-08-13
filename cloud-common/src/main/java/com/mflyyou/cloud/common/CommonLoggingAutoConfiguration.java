@@ -16,10 +16,10 @@ import org.springframework.core.annotation.Order;
  */
 
 @ConditionalOnProperty(name = "app.logging.enable", havingValue = "true", matchIfMissing = true)
+@ConditionalOnClass({Advice.class})
 public class CommonLoggingAutoConfiguration {
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnClass({Advice.class})
     static class LoggingAdvisorConfiguration {
         @Bean
         @Role(value = BeanDefinition.ROLE_INFRASTRUCTURE)
