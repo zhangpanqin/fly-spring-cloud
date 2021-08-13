@@ -1,7 +1,6 @@
 package com.mflyyou.cloud.common.lock.executor;
 
 import com.mflyyou.cloud.common.lock.DistributedLock.LockType;
-import com.mflyyou.cloud.common.lock.ResultContainer;
 import com.mflyyou.cloud.common.lock.exception.DistributedLockAcquireException;
 import com.mflyyou.cloud.common.lock.exception.DistributedLockAcquireTimeoutException;
 import com.mflyyou.cloud.common.lock.exception.DistributedLockReleaseException;

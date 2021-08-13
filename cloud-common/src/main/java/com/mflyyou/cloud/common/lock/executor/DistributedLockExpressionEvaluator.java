@@ -1,4 +1,4 @@
-package com.mflyyou.cloud.common.lock;
+package com.mflyyou.cloud.common.lock.executor;
 
 import com.mflyyou.cloud.common.lock.exception.LockSpelExpressionException;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-class DistributedLockExpressionEvaluator extends CachedExpressionEvaluator {
+public class DistributedLockExpressionEvaluator extends CachedExpressionEvaluator {
 
     private final Map<ExpressionKey, Expression> keyCache = new ConcurrentHashMap<>(64);
 
@@ -33,17 +33,30 @@ class DistributedLockExpressionEvaluator extends CachedExpressionEvaluator {
         return evaluationContext;
     }
 
-    public String key(String keyExpression, AnnotatedElementKey methodKey, LockKeyEvaluationContext evalContext) {
+    public String key(String keyExpression,
+                      Method method,
+                      Object[] args,
+                      Object target,
+                      Class targetClass) {
         if (StringUtils.isEmpty(keyExpression)) {
-            return evalContext.getMethod().toString();
+            return method.toString();
         }
+        LockKeyEvaluationContext evaluationContext = this.createEvaluationContext(method,
+                args,
+                target,
+                targetClass);
         Object value;
         try {
-            value = getExpression(this.keyCache, methodKey, keyExpression).getValue(evalContext);
+            value = getExpression(this.keyCache, getAnnotatedElementKey(method, targetClass), keyExpression).getValue(evaluationContext);
         } catch (Exception e) {
-            throw new LockSpelExpressionException(String.format("SpEL [%s] parse error in [%s]", keyExpression, methodKey.toString()));
+            throw new LockSpelExpressionException(String.format("SpEL [%s] parse error in [%s]", keyExpression, method.toString()));
         }
-        return Optional.ofNullable(value).map(Object::toString).orElseGet(() -> evalContext.getMethod().toString());
+        return Optional.ofNullable(value).map(Object::toString).orElseGet(() -> method.toString());
+    }
+
+
+    private AnnotatedElementKey getAnnotatedElementKey(Method method, Class targetClass) {
+        return new AnnotatedElementKey(method, targetClass);
     }
 
     private static class LockExpressionRootObject {

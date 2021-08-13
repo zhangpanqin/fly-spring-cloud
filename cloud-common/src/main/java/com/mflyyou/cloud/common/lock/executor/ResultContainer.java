@@ -1,11 +1,11 @@
-package com.mflyyou.cloud.common.lock;
+package com.mflyyou.cloud.common.lock.executor;
 
 
 import com.mflyyou.cloud.common.lock.exception.DistributedLockTaskException;
 
 import java.util.concurrent.Callable;
 
-public class ResultContainer<T> implements Runnable {
+class ResultContainer<T> implements Runnable {
     private final Callable<T> callable;
     private Object result;
 
