@@ -2,10 +2,12 @@ package com.mflyyou.cloud.common.exception.resolver;
 
 import com.mflyyou.cloud.common.exception.AppException;
 import com.mflyyou.cloud.common.exception.ErrorCode;
+import com.mflyyou.cloud.common.lock.exception.AbstractDistributedLockAcquireException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
@@ -34,6 +36,7 @@ import java.util.stream.Collectors;
 import static com.mflyyou.cloud.common.exception.resolver.CommonErrorCode.DATA_FORMAT_INCORRECT;
 import static com.mflyyou.cloud.common.exception.resolver.CommonErrorCode.REQUEST_VALIDATION_FAILED;
 import static com.mflyyou.cloud.common.exception.resolver.CommonErrorCode.SERVER_ERROR;
+import static com.mflyyou.cloud.common.exception.resolver.CommonErrorCode.SERVER_IS_BUSY_AND_TRY_AGAIN_LATER;
 import static com.mflyyou.cloud.common.exception.resolver.CommonErrorResponse.MESSAGE;
 
 
@@ -48,6 +51,7 @@ import static com.mflyyou.cloud.common.exception.resolver.CommonErrorResponse.ME
  * <p>
  * 当前实现类仅仅处理接口异常
  */
+@Slf4j
 public class CommonHandlerExceptionResolver extends AbstractHandlerMethodExceptionResolver {
 
     /**
@@ -64,10 +68,27 @@ public class CommonHandlerExceptionResolver extends AbstractHandlerMethodExcepti
                                                            HttpServletResponse response,
                                                            @Nullable HandlerMethod handlerMethod,
                                                            Exception ex) {
+        log.error("exception info log:", ex);
+
+        /**
+         * 业务异常
+         */
         if (ex instanceof AppException) {
             return handleAppException((AppException) ex, request, response, handlerMethod);
         }
 
+        /**
+         * 分布式锁相关
+         */
+        if (ex instanceof AbstractDistributedLockAcquireException) {
+            return handleAbstractDistributedLockAcquireException(request, response, handlerMethod,
+                    (AbstractDistributedLockAcquireException) ex);
+        }
+
+        if (ex instanceof IllegalArgumentException) {
+            return handleIllegalArgumentException(request, response, handlerMethod,
+                    (IllegalArgumentException) ex);
+        }
         /**
          * convert 转换异常
          */
@@ -121,6 +142,19 @@ public class CommonHandlerExceptionResolver extends AbstractHandlerMethodExcepti
         return null;
     }
 
+    protected ModelAndView handleAbstractDistributedLockAcquireException(HttpServletRequest request,
+                                                                         HttpServletResponse response,
+                                                                         HandlerMethod handlerMethod,
+                                                                         AbstractDistributedLockAcquireException ex) {
+        ModelAndView modelAndView = new ModelAndView();
+        MappingJackson2JsonView jackson2JsonView = new MappingJackson2JsonView();
+        modelAndView.setView(jackson2JsonView);
+        // 设置接口状态码
+        modelAndView.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        // 设置返回的 json 数据
+        modelAndView.addAllObjects(buildErrorResponse(SERVER_IS_BUSY_AND_TRY_AGAIN_LATER, Map.of(MESSAGE, ex.getMessage())));
+        return modelAndView;
+    }
 
     protected ModelAndView handleMethodArgumentNotValidException(HttpServletRequest request,
                                                                  HttpServletResponse response,
@@ -225,6 +259,20 @@ public class CommonHandlerExceptionResolver extends AbstractHandlerMethodExcepti
                 .message(message)
                 .build()
                 .toMap();
+    }
+
+    private ModelAndView handleIllegalArgumentException(HttpServletRequest request,
+                                                        HttpServletResponse response,
+                                                        HandlerMethod handlerMethod,
+                                                        IllegalArgumentException ex) {
+        ModelAndView modelAndView = new ModelAndView();
+        MappingJackson2JsonView jackson2JsonView = new MappingJackson2JsonView();
+        modelAndView.setView(jackson2JsonView);
+        // 设置接口状态码
+        modelAndView.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        // 设置返回的 json 数据
+        modelAndView.addAllObjects(buildErrorResponse(SERVER_ERROR, Map.of(MESSAGE, ex.getMessage())));
+        return modelAndView;
     }
 
     private ModelAndView handleConstraintViolationException(HttpServletRequest request,

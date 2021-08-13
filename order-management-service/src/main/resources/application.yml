@@ -9,6 +9,9 @@ spring:
     import:
       - optional:configserver:http://localhost:8889
       - optional:my:/my_config
+  redis:
+    host: localhost
+    port: 9911 # Redis服务器连接端口
 app:
   confi_test: confi_test
   config_sort: "classpath:/application.yml"

@@ -1,4 +1,4 @@
-package com.mflyyou.cloud.common.web.convert;
+package com.mflyyou.cloud.common.convert;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -8,7 +8,7 @@ import org.springframework.lang.Nullable;
 import java.time.Instant;
 
 @Slf4j
-public class StringToInstantConverter implements Converter<String, Instant> {
+public class String2InstantConverter implements Converter<String, Instant> {
 
     @Override
     public Instant convert(@Nullable String source) {

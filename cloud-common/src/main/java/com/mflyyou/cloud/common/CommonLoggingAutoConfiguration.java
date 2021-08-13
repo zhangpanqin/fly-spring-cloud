@@ -1,25 +1,31 @@
 package com.mflyyou.cloud.common;
 
 import com.mflyyou.cloud.common.log.LoggingAdvisor;
-import org.aspectj.lang.reflect.Advice;
+import org.aopalliance.aop.Advice;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 /**
  * 打印日志
  */
-@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-@ConditionalOnClass({Advice.class})
+
 @ConditionalOnProperty(name = "app.logging.enable", havingValue = "true", matchIfMissing = true)
 public class CommonLoggingAutoConfiguration {
 
-    @Bean
-    @Role(value = BeanDefinition.ROLE_INFRASTRUCTURE)
-    public LoggingAdvisor buildCommonLoggingAdvisor() {
-        return new LoggingAdvisor();
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass({Advice.class})
+    static class LoggingAdvisorConfiguration {
+        @Bean
+        @Role(value = BeanDefinition.ROLE_INFRASTRUCTURE)
+        @Order(Ordered.HIGHEST_PRECEDENCE - 1000)
+        public LoggingAdvisor buildCommonLoggingAdvisor() {
+            return new LoggingAdvisor();
+        }
     }
 }

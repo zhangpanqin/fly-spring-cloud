@@ -21,19 +21,27 @@ public class LoggingAdvice implements MethodInterceptor {
             log.info("Entering method {}.{}({})",
                     invocation.getMethod().getDeclaringClass().getName(),
                     invocation.getMethod().getName(),
-                    getArgumentsString(invocation));
+                    getArgumentsString(invocation.getArguments()));
         }
-        Object result = invocation.proceed();
-        long execTime = watch.elapsed(TimeUnit.MILLISECONDS);
-        if (log.isInfoEnabled()) {
-            log.info("Exiting method {}.{}; execution time: {}ms; response: {};",
+        try {
+            Object result = invocation.proceed();
+            if (log.isInfoEnabled()) {
+                log.info("Exiting method {}.{}; execution time: {}ms; response: {};",
+                        invocation.getMethod().getDeclaringClass().getName(),
+                        invocation.getMethod().getName(),
+                        watch.elapsed(TimeUnit.MILLISECONDS),
+                        desensitizeCopy(result)
+                );
+            }
+            return result;
+        } catch (Throwable ex) {
+            log.error("Exiting method {}.{}; execution time: {}ms; exec failed;",
                     invocation.getMethod().getDeclaringClass().getName(),
                     invocation.getMethod().getName(),
-                    execTime,
-                    desensitizeCopy(result)
-            );
+                    watch.elapsed(TimeUnit.MILLISECONDS),
+                    ex);
+            throw ex;
         }
-        return result;
     }
 
     private String desensitizeCopy(Object originalLogInfo) {
@@ -47,8 +55,8 @@ public class LoggingAdvice implements MethodInterceptor {
         }
     }
 
-    private String getArgumentsString(MethodInvocation invocation) {
-        return Arrays.stream(invocation.getArguments()).map(argument -> {
+    private String getArgumentsString(Object... arguments) {
+        return Arrays.stream(arguments).map(argument -> {
             try {
                 return desensitizeCopy(argument);
             } catch (Throwable e) {

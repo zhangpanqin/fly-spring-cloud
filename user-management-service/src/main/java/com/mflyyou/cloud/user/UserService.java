@@ -60,7 +60,7 @@ public class UserService {
                 .build();
     }
 
-    @Cacheable(value = CACHE_NAME)
+    @Cacheable(value = CACHE_NAME, key = "#id")
     public GetUserResponse getUserInfo(Long id) {
         log.info("执行了,{}", redisTemplate.opsForValue().get("key22"));
 

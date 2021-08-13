@@ -1,6 +1,7 @@
 package com.mflyyou.cloud.order;
 
 import com.mflyyou.cloud.common.exception.AccessDeniedAppException;
+import com.mflyyou.cloud.common.lock.DistributedLock;
 import com.mflyyou.cloud.common.log.annotation.Loggable;
 import com.mflyyou.cloud.sdk.OrderApi;
 import com.mflyyou.cloud.sdk.request.CreateOrderRequest;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -52,6 +54,7 @@ public class OrderController implements OrderApi {
 
     @GetMapping("/get/{date}")
     @Loggable
+    @DistributedLock(value = "#date22")
     public DateDTO test(@PathVariable LocalDate date, LocalDateTime localDateTime, Instant instant) {
         return DateDTO.builder()
                 .localDate(date)
@@ -77,7 +80,8 @@ public class OrderController implements OrderApi {
     }
 
     @GetMapping("/validator1")
-    public DateDTO test334(@NotBlank(message = "name is empty") String name) {
+    @Loggable
+    public DateDTO test334(@NotBlank @Min(value = 10, message = "name is empty") String name) {
         return DateDTO.builder().build();
     }
 
@@ -95,5 +99,10 @@ public class OrderController implements OrderApi {
             throw new RuntimeException("commonController 处理");
         }
         return DateDTO.builder().build();
+    }
+
+    @GetMapping("/lock/{id}")
+    public Long test213(@PathVariable Long id) {
+        return orderService.lock(id);
     }
 }

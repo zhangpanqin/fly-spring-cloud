@@ -10,7 +10,9 @@ public enum CommonErrorCode implements ErrorCode {
 
     REQUEST_VALIDATION_FAILED(400, "Data is invalid and the check failed"),
 
-    SERVER_ERROR(500, "Server error not resolve");
+    SERVER_ERROR(500, "Server error not resolve"),
+
+    SERVER_IS_BUSY_AND_TRY_AGAIN_LATER(500, "Server is busy and try again later");
 
 
     private final int status;

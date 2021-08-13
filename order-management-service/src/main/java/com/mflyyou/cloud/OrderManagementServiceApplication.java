@@ -4,6 +4,7 @@ import com.mflyyou.cloud.common.EnableLogging;
 import com.mflyyou.cloud.order.AppConfig;
 import com.mflyyou.cloud.order.ScopeTest;
 import com.mflyyou.cloud.order.TestInit;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -29,6 +30,7 @@ public class OrderManagementServiceApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(OrderManagementServiceApplication.class, args);
         System.out.println(run.getEnvironment().getProperty("app.config_sort"));
+        System.out.println(run.getBean(RedissonClient.class));
     }
 
     //    @Scheduled(fixedDelay = 5000)
