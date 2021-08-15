@@ -6,15 +6,15 @@ package com.mflyyou.cloud.common.lock.exception;
  */
 public abstract class AbstractDistributedLockAcquireException extends RuntimeException {
 
-    public AbstractDistributedLockAcquireException(String message, Throwable e) {
+    protected AbstractDistributedLockAcquireException(String message, Throwable e) {
         super(message, e);
     }
 
-    public AbstractDistributedLockAcquireException(String message) {
+    protected AbstractDistributedLockAcquireException(String message) {
         super(message);
     }
 
-    public AbstractDistributedLockAcquireException(Throwable e) {
+    protected AbstractDistributedLockAcquireException(Throwable e) {
         super(e);
     }
 }

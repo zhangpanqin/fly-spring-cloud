@@ -4,12 +4,12 @@ package com.mflyyou.cloud.common.lock;
 import com.mflyyou.cloud.common.lock.exception.DistributedLockTaskException;
 import com.mflyyou.cloud.common.lock.executor.DistributedLockExecutor;
 import com.mflyyou.cloud.common.lock.executor.DistributedLockExpressionEvaluator;
+import com.mflyyou.cloud.common.lock.executor.LockTask;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.Callable;
 
 @Slf4j
 public class DistributedLockAdvice implements MethodInterceptor {
@@ -22,31 +22,32 @@ public class DistributedLockAdvice implements MethodInterceptor {
 
 
     @Override
-    public Object invoke(MethodInvocation invocation) {
+    public Object invoke(MethodInvocation invocation) throws Throwable {
         Method method = invocation.getMethod();
         DistributedLock annotation = method.getAnnotation(DistributedLock.class);
-        return distributedLockExecutor.execute(getCallable(invocation),
-                getLockName(annotation,
-                        method,
-                        invocation.getArguments(),
-                        invocation.getThis(),
-                        invocation.getThis().getClass()),
-                annotation.type(),
-                annotation.waitTime(),
-                annotation.leaseTime(),
-                annotation.appName());
-
+        try {
+            return distributedLockExecutor.execute(getLockTask(invocation),
+                    getLockName(annotation,
+                            method,
+                            invocation.getArguments(),
+                            invocation.getThis(),
+                            method.getDeclaringClass()),
+                    annotation.type(),
+                    annotation.waitTime(),
+                    annotation.leaseTime(),
+                    annotation.appName());
+        } catch (DistributedLockTaskException e) {
+            throw e.getOriginal();
+        }
     }
 
 
-    public Callable getCallable(MethodInvocation invocation) {
+    public LockTask<Object> getLockTask(MethodInvocation invocation) {
         return () -> {
             try {
                 return invocation.proceed();
             } catch (Throwable throwable) {
-                throw new DistributedLockTaskException(
-                        String.format("method [s%] exec error in DistributedLock locking", invocation.getMethod()),
-                        throwable);
+                throw new DistributedLockTaskException(throwable);
             }
         };
     }
@@ -63,4 +64,5 @@ public class DistributedLockAdvice implements MethodInterceptor {
                 targetClass
         );
     }
+
 }

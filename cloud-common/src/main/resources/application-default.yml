@@ -1,5 +1,8 @@
 server:
   max-http-header-size: 2MB
+  error:
+    includeException: true
+    includeMessage: ALWAYS
 spring:
   cache:
     type: redis

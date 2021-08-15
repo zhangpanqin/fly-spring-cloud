@@ -1,6 +1,7 @@
 package com.mflyyou.cloud.user;
 
 import brave.Tracer;
+import com.mflyyou.cloud.common.lock.DistributedLock;
 import com.mflyyou.cloud.sdk.request.CreateOrderRequest;
 import com.mflyyou.cloud.sdk.request.CreateUserRequest;
 import com.mflyyou.cloud.sdk.response.CreateOrderResponse;
@@ -8,7 +9,6 @@ import com.mflyyou.cloud.sdk.response.CreateUserResponse;
 import com.mflyyou.cloud.sdk.response.GetUserResponse;
 import com.mflyyou.cloud.sdk.response.UserResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,9 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -49,18 +51,25 @@ public class UserService {
                 .build();
     }
 
-    @CacheEvict(value = CACHE_NAME, allEntries = true)
+    @Transactional
     public CreateUserResponse createUser(CreateUserRequest createUserRequest) {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(ThreadLocalRandom.current().nextLong());
         userEntity.setUsername(createUserRequest.getUsername());
         userRepository.save(userEntity);
+        System.out.println(userEntity);
+        try {
+            TimeUnit.SECONDS.sleep(10);
+        } catch (InterruptedException e) {
+
+        }
         return CreateUserResponse.builder()
                 .id(userEntity.getId())
                 .build();
     }
 
     @Cacheable(value = CACHE_NAME, key = "#id")
+    @DistributedLock(value = "aaa",leaseTime = -1L)
     public GetUserResponse getUserInfo(Long id) {
         log.info("执行了,{}", redisTemplate.opsForValue().get("key22"));
 

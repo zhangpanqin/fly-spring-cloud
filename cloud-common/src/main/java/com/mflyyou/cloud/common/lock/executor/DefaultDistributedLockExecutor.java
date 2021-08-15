@@ -4,6 +4,7 @@ import com.mflyyou.cloud.common.lock.DistributedLock.LockType;
 import com.mflyyou.cloud.common.lock.exception.DistributedLockAcquireException;
 import com.mflyyou.cloud.common.lock.exception.DistributedLockAcquireTimeoutException;
 import com.mflyyou.cloud.common.lock.exception.DistributedLockReleaseException;
+import com.mflyyou.cloud.common.lock.executor.LockTask.LockTaskForRunnable;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -11,7 +12,6 @@ import org.redisson.client.WriteRedisConnectionException;
 import org.springframework.core.env.Environment;
 
 import java.util.Objects;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import static com.mflyyou.cloud.common.lock.DistributedLock.LeaseTime.INFINITE;
@@ -75,10 +75,10 @@ public class DefaultDistributedLockExecutor extends AbstractDistributedLockExecu
     }
 
     @Override
-    public <T> T execute(Callable<T> runnable, String key, LockType lockType, long waitTime, long leaseTime, boolean addAppNameAndEnv) {
-        ResultContainer<T> tResultContainer = new ResultContainer<>(runnable);
-        execute(tResultContainer, key, lockType, waitTime, leaseTime, addAppNameAndEnv);
-        return tResultContainer.getResult();
+    public <T> T execute(LockTask<T> runnable, String key, LockType lockType, long waitTime, long leaseTime, boolean addAppNameAndEnv) {
+        LockTaskForRunnable<T> tLockTask = new LockTaskForRunnable(runnable);
+        execute(tLockTask, key, lockType, waitTime, leaseTime, addAppNameAndEnv);
+        return tLockTask.getResult();
     }
 
 }

@@ -14,7 +14,7 @@ public @interface DistributedLock {
     /**
      * 锁的唯一标识.
      * 支持 SpEL 表达式
-     * <p>e.g. "#{#param.id}", "lock#{#id}", "lock#{1+1}"</p>
+     * <p>e.g. "#{#param.id}", "lock#{#id}", "lock#{1+1}","asdfa"</p>
      */
     String value();
 

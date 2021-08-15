@@ -14,5 +14,5 @@ public interface DistributedLockExecutor {
      */
     void execute(Runnable runnable, String key, LockType lockType, long waitTime, long leaseTime, boolean addAppNameAndEnv) throws InterruptedException;
 
-    <T> T execute(Callable<T> runnable, String key, LockType lockType, long waitTime, long leaseTime, boolean addAppNameAndEnv);
+    <T> T execute(LockTask<T> runnable, String key, LockType lockType, long waitTime, long leaseTime, boolean addAppNameAndEnv);
 }

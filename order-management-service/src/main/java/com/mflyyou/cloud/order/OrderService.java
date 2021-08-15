@@ -37,7 +37,7 @@ public class OrderService {
     }
 
     @SneakyThrows
-    @DistributedLock(value = "#id",leaseTime = 45_000L)
+    @DistributedLock(value = "#id",leaseTime = 10_000L)
     public Long lock(Long id) {
         if (Objects.equals(1L, id)) {
             TimeUnit.SECONDS.sleep(30);
