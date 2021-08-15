@@ -8,16 +8,15 @@ import com.mflyyou.cloud.sdk.response.CreateOrderResponse;
 import com.mflyyou.cloud.sdk.response.CreateUserResponse;
 import com.mflyyou.cloud.sdk.response.GetUserResponse;
 import com.mflyyou.cloud.sdk.response.UserResponse;
+import com.mflyyou.cloud.user.aop.Order1;
+import com.mflyyou.cloud.user.aop.Order2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -52,16 +51,19 @@ public class UserService {
     }
 
     @Transactional
+    @DistributedLock(value = "#{#createUserRequest.username}", leaseTime = -1L)
     public CreateUserResponse createUser(CreateUserRequest createUserRequest) {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(ThreadLocalRandom.current().nextLong());
         userEntity.setUsername(createUserRequest.getUsername());
         userRepository.save(userEntity);
-        System.out.println(userEntity);
+        System.out.println(userEntity.getId());
         try {
-            TimeUnit.SECONDS.sleep(10);
-        } catch (InterruptedException e) {
-
+            if (Long.valueOf(createUserRequest.getUsername()).equals(11L)) {
+                TimeUnit.SECONDS.sleep(20);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("报错了");
         }
         return CreateUserResponse.builder()
                 .id(userEntity.getId())
@@ -69,7 +71,7 @@ public class UserService {
     }
 
     @Cacheable(value = CACHE_NAME, key = "#id")
-    @DistributedLock(value = "aaa",leaseTime = -1L)
+    @DistributedLock(value = "#{#id}", leaseTime = -1L)
     public GetUserResponse getUserInfo(Long id) {
         log.info("执行了,{}", redisTemplate.opsForValue().get("key22"));
 
@@ -80,20 +82,12 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("查询的数据不存在"));
     }
 
+    @Order1
+    @Order2
+    public GetUserResponse aop() {
 
-    public void test() {
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setName("SomeTxName");
-        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-        TransactionStatus transaction = ptm.getTransaction(def);
+        System.out.println("UserService.aop");
 
-        try {
-
-        } catch (Exception e) {
-            ptm.rollback(transaction);
-            throw e;
-        } finally {
-            ptm.commit(transaction);
-        }
+        return GetUserResponse.builder().username("111").build();
     }
 }

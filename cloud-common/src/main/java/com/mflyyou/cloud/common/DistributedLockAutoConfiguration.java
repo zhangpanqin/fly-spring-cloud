@@ -16,8 +16,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.validation.constraints.NotNull;
+
+import static com.mflyyou.cloud.common.constant.AopOrderConstant.DISTRIBUTED_LOCK_AOP_CONSTANT;
+import static com.mflyyou.cloud.common.constant.AopOrderConstant.TRANSACTION_AOP_CONSTANT;
 
 @AutoConfigureAfter(RedisAutoConfiguration.class)
 @ConditionalOnProperty(name = "app.distributed_lock.enable", havingValue = "true", matchIfMissing = true)
@@ -26,12 +30,14 @@ import javax.validation.constraints.NotNull;
 public class DistributedLockAutoConfiguration {
 
     @Configuration(proxyBeanMethods = false)
+    @EnableTransactionManagement(order= TRANSACTION_AOP_CONSTANT)
     static class DistributedLockAdvisorConfiguration {
 
         @Bean
-        @Order(Ordered.LOWEST_PRECEDENCE + 1000)
         public DistributedLockAdvisor distributedLockAdvisor(DistributedLockExecutor distributedLockExecutor) {
-            return new DistributedLockAdvisor(distributedLockExecutor);
+            DistributedLockAdvisor distributedLockAdvisor = new DistributedLockAdvisor(distributedLockExecutor);
+            distributedLockAdvisor.setOrder(Ordered.LOWEST_PRECEDENCE);
+            return distributedLockAdvisor;
         }
 
         @Bean

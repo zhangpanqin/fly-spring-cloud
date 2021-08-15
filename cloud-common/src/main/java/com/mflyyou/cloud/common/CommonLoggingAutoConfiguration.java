@@ -8,8 +8,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
+
+import static com.mflyyou.cloud.common.constant.AopOrderConstant.LOGGING_AOP_CONSTANT;
 
 /**
  * 打印日志
@@ -23,9 +23,10 @@ public class CommonLoggingAutoConfiguration {
     static class LoggingAdvisorConfiguration {
         @Bean
         @Role(value = BeanDefinition.ROLE_INFRASTRUCTURE)
-        @Order(Ordered.HIGHEST_PRECEDENCE - 1000)
         public LoggingAdvisor buildCommonLoggingAdvisor() {
-            return new LoggingAdvisor();
+            LoggingAdvisor loggingAdvisor = new LoggingAdvisor();
+            loggingAdvisor.setOrder(LOGGING_AOP_CONSTANT);
+            return loggingAdvisor;
         }
     }
 }

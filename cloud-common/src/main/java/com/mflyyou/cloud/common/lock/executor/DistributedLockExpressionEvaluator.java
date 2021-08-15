@@ -7,12 +7,9 @@ import org.springframework.context.expression.CachedExpressionEvaluator;
 import org.springframework.context.expression.MethodBasedEvaluationContext;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.expression.Expression;
-import org.springframework.expression.TypedValue;
 import org.springframework.expression.common.TemplateParserContext;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,8 +26,8 @@ public class DistributedLockExpressionEvaluator extends CachedExpressionEvaluato
             Object target,
             Class targetClass) {
 
-//        LockExpressionRootObject lockExpressionRootObject = new LockExpressionRootObject(method, args, target, targetClass);
-        LockKeyEvaluationContext evaluationContext = new LockKeyEvaluationContext(TypedValue.NULL,
+        LockExpressionRootObject lockExpressionRootObject = new LockExpressionRootObject(method, args, target, targetClass);
+        LockKeyEvaluationContext evaluationContext = new LockKeyEvaluationContext(lockExpressionRootObject,
                 method,
                 args,
                 getParameterNameDiscoverer());
@@ -45,18 +42,13 @@ public class DistributedLockExpressionEvaluator extends CachedExpressionEvaluato
         if (StringUtils.isEmpty(keyExpression)) {
             return method.toString();
         }
-        StandardEvaluationContext context = new StandardEvaluationContext();
-        Map<String, Object> arguments = this.getArguments(method, args);
-        for (Map.Entry<String, Object> entry : arguments.entrySet()) {
-            context.setVariable(entry.getKey(), entry.getValue());
-        }
-        String value;
+        MethodBasedEvaluationContext context = createEvaluationContext(method, args, target, targetClass);
         try {
-            value = getExpression(this.keyCache, getAnnotatedElementKey(method, targetClass), keyExpression).getValue(context, String.class);
+            String value = getExpression(this.keyCache, getAnnotatedElementKey(method, targetClass), keyExpression).getValue(context, String.class);
+            return Optional.ofNullable(value).map(Object::toString).orElseGet(() -> method.toString());
         } catch (Exception e) {
             throw new LockSpelExpressionException(String.format("SpEL [%s] parse error in [%s]", keyExpression, method.toString()));
         }
-        return Optional.ofNullable(value).map(Object::toString).orElseGet(() -> method.toString());
     }
 
     public Expression getExpression(Map<ExpressionKey, Expression> cache,
@@ -71,16 +63,6 @@ public class DistributedLockExpressionEvaluator extends CachedExpressionEvaluato
         return expr;
     }
 
-    private Map<String, Object> getArguments(Method method, Object[] args) {
-        String[] params = this.getParameterNameDiscoverer().getParameterNames(method);
-        HashMap<String, Object> map = new HashMap<>();
-        if (params!=null) {
-            for (int i = 0; i < params.length; i++) {
-                map.put(params[i], args[i]);
-            }
-        }
-        return map;
-    }
 
     private AnnotatedElementKey getAnnotatedElementKey(Method method, Class targetClass) {
         return new AnnotatedElementKey(method, targetClass);

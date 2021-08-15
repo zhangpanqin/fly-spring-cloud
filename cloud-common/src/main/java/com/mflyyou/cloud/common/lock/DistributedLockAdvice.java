@@ -26,7 +26,7 @@ public class DistributedLockAdvice implements MethodInterceptor {
         Method method = invocation.getMethod();
         DistributedLock annotation = method.getAnnotation(DistributedLock.class);
         try {
-            return distributedLockExecutor.execute(getLockTask(invocation),
+            Object execute = distributedLockExecutor.execute(getLockTask(invocation),
                     getLockName(annotation,
                             method,
                             invocation.getArguments(),
@@ -36,6 +36,7 @@ public class DistributedLockAdvice implements MethodInterceptor {
                     annotation.waitTime(),
                     annotation.leaseTime(),
                     annotation.appName());
+            return execute;
         } catch (DistributedLockTaskException e) {
             throw e.getOriginal();
         }

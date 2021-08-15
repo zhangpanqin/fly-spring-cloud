@@ -42,4 +42,8 @@ public class UserController implements UserApi {
         return userService.getUserInfo(id);
     }
 
+    @GetMapping("/aop")
+    public GetUserResponse aop() {
+        return userService.aop();
+    }
 }
