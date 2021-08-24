@@ -70,4 +70,7 @@ subprojects {
     tasks.withType(Test) {
         useJUnitPlatform()
     }
+
+    apply from: "${rootProject.projectDir}/gradle/checkstyle/checkstyle.gradle"
+    apply from: "${rootProject.projectDir}/gradle/git-hooks/git-hooks.gradle"
 }
